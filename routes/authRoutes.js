@@ -1,33 +1,48 @@
+// /backend/routes/authRoutes.js
 const express = require('express');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const jwt = require('jsonwebtoken');
 
 const router = express.Router();
 
-router.post('/register', async (req, res) => {
-  const { username, password } = req.body;
-  try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ username, password: hashedPassword });
-    const savedUser = await newUser.save();
-    res.status(201).json(savedUser);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-});
-
+// Login Route
 router.post('/login', async (req, res) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
+
   try {
-    const user = await User.findOne({ username });
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    // Find user by email
+    const user = await User.findOne({ email });
+
+    if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token });
+
+    // Check if password matches
+    const isMatch = await user.comparePassword(password);
+
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    // Create JWT payload
+    const payload = {
+      user: {
+        id: user.id,
+      },
+    };
+
+    // Sign JWT token
+    jwt.sign(
+      payload,
+      process.env.JWT_SECRET, // Your secret key
+      { expiresIn: '1h' }, // Token expiration time
+      (err, token) => {
+        if (err) throw err;
+        res.json({ token });
+      }
+    );
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
