@@ -1,6 +1,7 @@
 // /backend/server.js
 const express = require('express');
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 require('dotenv').config();
 
 const app = express();
@@ -32,7 +33,7 @@ const createDefaultUser = async () => {
   try {
     const defaultUser = {
       email: 'hello@example.com',
-      password: 'helloworld', // Ensure this password is hashed if using bcrypt
+      password: 'helloworld', // Plain text password for hashing
     };
 
     // Check if user already exists
@@ -42,8 +43,15 @@ const createDefaultUser = async () => {
       return;
     }
 
-    // Create and save new user
-    const newUser = new User(defaultUser);
+    // Hash the password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(defaultUser.password, salt);
+
+    // Create and save new user with hashed password
+    const newUser = new User({
+      email: defaultUser.email,
+      password: hashedPassword,
+    });
     await newUser.save();
     console.log('Default user created.');
   } catch (err) {

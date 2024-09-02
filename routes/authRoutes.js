@@ -1,48 +1,32 @@
 // /backend/routes/authRoutes.js
 const express = require('express');
-const User = require('../models/User');
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
+const User = require('../models/User');
 const router = express.Router();
 
 // Login Route
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
-
+  
   try {
     // Find user by email
     const user = await User.findOne({ email });
-
     if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ msg: 'Invalid credentials' });
     }
 
-    // Check if password matches
-    const isMatch = await user.comparePassword(password);
-
+    // Compare passwords
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ msg: 'Invalid credentials' });
     }
 
-    // Create JWT payload
-    const payload = {
-      user: {
-        id: user.id,
-      },
-    };
-
-    // Sign JWT token
-    jwt.sign(
-      payload,
-      process.env.JWT_SECRET, // Your secret key
-      { expiresIn: '1h' }, // Token expiration time
-      (err, token) => {
-        if (err) throw err;
-        res.json({ token });
-      }
-    );
+    // Create and send JWT token
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    res.json({ token });
   } catch (err) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ msg: 'Server error' });
   }
 });
 
