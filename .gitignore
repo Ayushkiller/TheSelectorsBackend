@@ -1,3 +1,5 @@
 
 /node_modules
 /interview-backend/interview-backend/node_modules
+package-lock.json
+package.json
