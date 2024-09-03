@@ -1,27 +1,11 @@
-const express = require('express');
-const Interview = require('../models/Interview');
-const authMiddleware = require('../middleware/authMiddleware');
+const mongoose = require('mongoose');
 
-const router = express.Router();
-
-router.get('/', async (req, res) => {
-  try {
-    const interviews = await Interview.find();
-    res.json(interviews);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+const interviewSchema = new mongoose.Schema({
+  subject: { type: String, required: true },
+  date: { type: Date, required: true },
+  candidateName: { type: String, required: true },
+  requiredExpertise: { type: String, required: true },
+  expertAssigned: { type: Boolean, default: false }
 });
 
-router.post('/', authMiddleware, async (req, res) => {
-  const { subject, date, candidateName, requiredExpertise } = req.body;
-  try {
-    const newInterview = new Interview({ subject, date, candidateName, requiredExpertise });
-    const savedInterview = await newInterview.save();
-    res.status(201).json(savedInterview);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-});
-
-module.exports = router;
+module.exports = mongoose.model('Interview', interviewSchema);
