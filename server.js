@@ -1,16 +1,18 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const cors = require('cors');  // Add this line to import cors
 require('dotenv').config();
 
 const app = express();
 
-// Models
-const User = require('./models/User');
-
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors());  // Add this line to enable CORS
+
+// Models
+const User = require('./models/User');
 
 // Connect to MongoDB
 const connectDB = async () => {
