@@ -22,8 +22,8 @@ const connectDB = async () => {
     console.log('MongoDB connected');
     await createDefaultUser(); // Create default user after successful connection
   } catch (err) {
-    console.error(err.message);
-    process.exit(1);
+    console.error('Database connection failed:', err.message);
+    process.exit(1); // Exit process with failure
   }
 };
 
@@ -54,7 +54,7 @@ const createDefaultUser = async () => {
     await newUser.save();
     console.log('Default user created.');
   } catch (err) {
-    console.error(err.message);
+    console.error('Error creating default user:', err.message);
   }
 };
 
