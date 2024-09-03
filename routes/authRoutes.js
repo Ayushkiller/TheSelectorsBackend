@@ -1,14 +1,7 @@
-// /backend/routes/authRoutes.js
-const express = require('express');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-const router = express.Router();
-
-// Login Route
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
-  
+  console.log('Received credentials:', { email, password }); // Debug log
+
   try {
     // Find user by email
     const user = await User.findOne({ email });
@@ -29,5 +22,3 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ msg: 'Server error' });
   }
 });
-
-module.exports = router;
