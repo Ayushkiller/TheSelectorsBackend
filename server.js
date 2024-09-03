@@ -1,7 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const cors = require('cors');  // Add this line to import cors
+const cors = require('cors');  
+const interviewRoutes = require('./routes/interviewRoutes');
 require('dotenv').config();
 
 const app = express();
@@ -9,7 +10,8 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());  // Add this line to enable CORS
+app.use(cors()); 
+app.use('/api/interviews', interviewRoutes);
 
 // Models
 const User = require('./models/User');
