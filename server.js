@@ -1,22 +1,18 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const cors = require('cors');  
-const interviewRoutes = require('./routes/interviewRoutes');
+const cors = require('cors');
 require('dotenv').config();
 
+// Initialize the Express application
 const app = express();
 
 // Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cors()); 
-app.use('/api/interviews', interviewRoutes);
+app.use(express.json()); // For parsing application/json
+app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
+app.use(cors()); // For enabling CORS
 
-// Models
-const User = require('./models/User');
-
-// Connect to MongoDB
+// Connect to MongoDB and create default user
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI, {
@@ -62,13 +58,19 @@ const createDefaultUser = async () => {
   }
 };
 
-// Routes
-app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/users', require('./routes/userRoutes'));
+// Import routes
+const interviewRoutes = require('./routes/interviewRoutes');
+const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
 
-// Start server
+// Use routes
+app.use('/api/interviews', interviewRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+
+// Start the server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
-// Connect to database and start server
+// Connect to the database and start the server
 connectDB();
