@@ -70,7 +70,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 
 // Start the server
-const PORT = process.env.PORT || 1638;
+const PORT = process.env.PORT || 1284;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 // Connect to the database and start the server
