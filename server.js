@@ -31,7 +31,10 @@ const errorHandler = (err, req, res, next) => {
 // Connect to MongoDB and create default user
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/interview-panel');
+    await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/interview-panel', {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
     console.log('MongoDB connected');
     await createDefaultUser(); // Create default user after successful connection
   } catch (err) {
@@ -143,7 +146,7 @@ app.use(errorHandler);
 
 // Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`)); // Bind to 0.0.0.0 to accept external connections
 
 // Connect to the database and start the server
 connectDB();
