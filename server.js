@@ -19,14 +19,45 @@ const connectDB = async () => {
     await mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-    });    
+    });
     console.log('MongoDB connected');
+    await createDefaultUser(); // Create default user after successful connection
   } catch (err) {
     console.error('Database connection failed:', err.message);
     process.exit(1); // Exit process with failure
   }
 };
 
+// Function to create a default user
+const createDefaultUser = async () => {
+  try {
+    const defaultUser = {
+      email: 'hello@example.com',
+      password: 'helloworld', // Plain text password for hashing
+    };
+
+    // Check if user already exists
+    const userExists = await User.findOne({ email: defaultUser.email });
+    if (userExists) {
+      console.log('Default user already exists.');
+      return;
+    }
+
+    // Hash the password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(defaultUser.password, salt);
+
+    // Create and save new user with hashed password
+    const newUser = new User({
+      email: defaultUser.email,
+      password: hashedPassword,
+    });
+    await newUser.save();
+    console.log('Default user created.');
+  } catch (err) {
+    console.error('Error creating default user:', err.message);
+  }
+};
 
 // Import routes
 const interviewRoutes = require('./routes/interviewRoutes');
