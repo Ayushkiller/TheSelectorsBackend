@@ -13,11 +13,7 @@ const Interview = require('./models/Interview');
 
 // Initialize Express app
 const app = express();
-const cors = require('cors');
-app.use(cors({
-  origin: 'http://localhost:3000', // or your frontend domain
-  credentials: true,
-}));
+
 
 // Middleware
 app.use(express.json());
