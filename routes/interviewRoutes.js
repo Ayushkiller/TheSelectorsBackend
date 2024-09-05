@@ -19,6 +19,12 @@ router.get('/', async (req, res) => {
 router.post('/', authMiddleware, async (req, res) => {
   console.log('POST /api/interviews - Creating new interview');
   const { subject, date, candidateName, requiredExpertise } = req.body;
+  
+  // Basic input validation
+  if (!subject || !date || !candidateName || !requiredExpertise) {
+    return res.status(400).json({ message: 'All fields are required' });
+  }
+
   try {
     const newInterview = new Interview({ subject, date, candidateName, requiredExpertise });
     const savedInterview = await newInterview.save();
